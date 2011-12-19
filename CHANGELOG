@@ -1,0 +1,76 @@
+V1.3.0
+* Feature: Added support for I18N ('en' and 'de' resources supplied).
+* Feature: Added support for Twitter's Web Intents (Reply, Retweet, Favorite tweets).
+* Feature: Added support for users' favorite tweets.
+* Feature: Added configuration option <code>locale</code>.
+* Feature: Added configuration option <code>showTweetFeed.autoConformToTwitterStyleguide</code> (Sets options to confirm to Twitter's styleguide regulations).
+* Feature: Added configuration option <code>showTweetFeed.showTwitterBird</code> (Show/hide Twitter bird icon beneath the timestamp of a tweet, linking to the tweeter's MiniProfile Web Intent).
+* Feature: Added configuration option <code>showTweetFeed.showActionReply</code> (Show tweet's 'Reply' action: supplies a link to popup the tweet's Reply Web Intent).
+* Feature: Added configuration option <code>showTweetFeed.showActionRetweet</code> (Show tweet's 'Retweet' action: supplies a link to popup the tweet's Retweet Web Intent).
+* Feature: Added configuration option <code>showTweetFeed.showActionFavorite</code> (Show tweet's 'Favorite' action (supplies a link to popup the tweet's Favorite Web Intent).
+* Feature: Added configuration option <code>tweetDataProvider</code>.
+* Feature: Added configuration option <code>rateLimitDataProvider</code>.
+* Feature: Added configuration option <code>tweetTwitterBirdDecorator</code>.
+* Feature: Added configuration option <code>tweetActionsDecorator</code>.
+* Feature: Added configuration option <code>tweetActionReplyDecorator</code>.
+* Feature: Added configuration option <code>tweetActionRetweetDecorator</code>.
+* Feature: Added configuration option <code>tweetActionFavoriteDecorator</code>.
+* Bugfix: Fixed an issue with showing duplicate tweets in the feed while using the <code>{literal}autorefresh: { mode: 'trigger-insert' }{/literal}</code> feature. Thanks to Adam Southorn!
+* Bugfix: Fixed an issue to prevent interference with the standard <code>widgets.js</code> file for the Tweet button. Thanks to Brad Beebe!
+* Bugfix: Fixed an issue with handling auto linking of @username and email addresses. Thanks to Brad Beebe!
+* Bugfix: The retweeter's screen name was not displayed correctly.
+* Test: 100+ Unit tests added, based on QUnit (Javascript Unit Testing Framework).
+
+V1.2.1
+* Feature: Support for Twitter's change to string representations of tweet IDs (Snowflake). Twitter will switch to their new ID generator using 64bit unsigned integers on 26th November 2010. You should update jTweetsAnywhere to V1.2.1 before this date.
+
+V1.2.0
+* Feature: Support for auto-refreshing tweet feeds to build realtime/live tickers
+* Feature: Support for several paging modes to show more tweets (mode: 'more' | 'prev-next' | 'endless-scroll')
+* Feature: Native retweets support
+* Feature: Tweet filter support
+* Feature: Element visualizer support
+* Feature: Event handler support
+* Feature: Value formatter support
+* Feature: Tweets cache support to minimize rate-limited Twitter API calls
+* Feature: Taking care of Twitter's rate limit when loading data from Twitter
+* Feature: Added configuration option showTweetFeed.showTimestamp (show/hide/auto-refresh a tweet's timestamp')
+* Feature: Added configuration option showTweetFeed.showProfileImages (show/hide a user's profile image')
+* Feature: Added configuration option showTweetFeed.showUserScreenNames (show/hide a user's screen name')
+* Feature: Added configuration option showTweetFeed.showUserFullNames (show/hide a user's full name
+* Feature: Added configuration option showTweetFeed.showGeoLocation (show/hide a tweet's geolocation attribute)
+* Feature: Added configuration option showTweetFeed.showInReplyTo (show/hide a tweet's in-reply-to attribute)
+* Feature: Added configuration option tweetUsernameDecorator
+* Feature: Added configuration option tweetGeoLocationDecorator
+* Feature: Added configuration option tweetInReplyToDecorator
+* Feature: Added configuration option tweetRetweeterDecorator
+* Feature: Added configuration option tweetFeedControlsDecorator
+* Feature: Added configuration option tweetFeedControlsMoreBtnDecorator
+* Feature: Added configuration option tweetFeedControlsPrevBtnDecorator
+* Feature: Added configuration option tweetFeedControlsNextBtnDecorator
+* Feature: Added configuration option tweetFeedAutorefreshTriggerDecorator
+* Feature: Added configuration option tweetFeedAutorefreshTriggerContentDecorator
+* Feature: Added configuration option noDataDecorator
+* Feature: Added configuration option tweetTimestampFormatter
+* Feature: Added configuration option tweetTimestampTooltipFormatter
+* Feature: Added configuration option tweetVisualizer
+* Feature: Added configuration option loadingIndicatorVisualizer
+* Feature: Added configuration option autorefreshTriggerVisualizer
+* Feature: Added configuration option onDataRequestHandler
+* Feature: Added configuration option onRateLimitDataHandler
+* Cleanup: tweetProfileImagePresent is deprecated now. Use showTweetFeed.showProfileImages instead
+
+V1.1.0
+* Feature: Added the tweet's permalink to it's timestamp
+* Feature: Added configuration option showTweetFeed.showSource (show a tweet's source ("via") attribute)
+* Feature: Added configuration option showTweetFeed.expandHovercards (initially show hovercards expanded)
+* Feature: Added configuration option tweetAttributesDecorator
+* Feature: Added configuration option tweetSourceDecorator
+* Feature: Added configuration option errorDecorator
+* Cleanup: Removed the generation of the <img> element attributes [width="48" height="48" border="0"] in defaultTweetProfileImageDecorator and defaultLoginInfoContentDecorator. Width and height are now controlled in the jTweetsAnywhere CSS.
+
+V1.0.1
+* Fixed an IE issue with parsing the tweet timestamp.
+
+V1.0.0
+* Initial release.
