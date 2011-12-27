@@ -1,5 +1,5 @@
 /**
- * jTweetsAnywhere V1.3.0
+ * jTweetsAnywhere - current development version
  * http://thomasbillenstein.com/jTweetsAnywhere/
  *
  * Copyright 2011, Thomas Billenstein
@@ -230,7 +230,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 {
 	$.fn.jTweetsAnywhere = function(config)
 	{
-		// setup the default options
+		/** setup the default options */
 		var options = $.extend(
 		{
 			/**
@@ -297,6 +297,43 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			 * but you can supply your own tweet filter to customize the tweet feed.
 			 */
 			tweetFilter: defaultTweetFilter,
+
+			/**
+			 * An array of widget part names that define presence and sequence of the
+			 * widget parts to be displayed. This option is closely related to the
+			 * showTweetFeed, showConnectButton, showLoginInfo, showFollowButton and
+			 * showTweetBox options. The parts option has more relevance than the show...
+			 * options and will override them. Though any extended configuration of the
+			 * show... options still remains there and hasn't changed.
+			 *
+			 * For example:
+			 * The following configuration will result in displaying the connect button,
+			 * the tweet box and the tweet feed in that order.
+			 *
+			 * ...
+			 * parts: ['connect-button', 'tweet-box', 'tweets'],
+			 *
+			 * showTweetFeed: {
+			 * 		showUserFullNames: true,
+             *		showSource: true,
+             *		showActionReply: true,
+             *		showActionRetweet: true,
+             *		showActionFavorite: true,
+             *		paging: {
+             *			mode: 'more'
+             *		}
+             * },
+			 * showTweetBox: false,
+			 * ...
+			 *
+			 * Currently available widget parts are:
+			 * 'tweets', 'connect-button', 'login-info', 'follow-button' and 'tweet-box'
+			 * (This also is the default sequence.)
+			 *
+			 * Sample: ['tweet-box', 'tweets']	// displays the tweet box on top of the
+			 *  								// tweet feed
+			 */
+			parts: null,
 
 			/**
 			 * A flag (true/false) that specifies whether to display a Tweet Feed
@@ -450,12 +487,8 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			 * A dataProvider is a function that delivers the "raw" Twitter data in
 			 * JSON format. ATM internal use only!
 			 */
-			tweetDataProvider:
-				defaultTweetDataProvider,
-				//mockedTweetDataProvider,
-			rateLimitDataProvider:
-				defaultRateLimitDataProvider,
-				//mockedRateLimitDataProvider,
+			tweetDataProvider: defaultTweetDataProvider,
+			rateLimitDataProvider: defaultRateLimitDataProvider,
 
 			/**
 			 * A decorator is a function that is responsible for constructing a certain
@@ -672,13 +705,13 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			_resourceBundle: null
 		}, config);
 
-		// save the plugin's base selector
+		/** save the plugin's base selector */
 		options._baseSelector = this.selector;
 
 		options.onOptionsInitializingHandler(options);
 		setupOptions(options);
 
-		// no main decorator? nothing to do!
+		/** no main decorator? nothing to do! */
 		if (!options.mainDecorator)
 		{
 			return;
@@ -688,10 +721,10 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 
 		return this.each(function()
 		{
-			// the DOM element, where to display the widget
+			/** the DOM element, where to display the widget */
 			options._baseElement = $(this);
 
-			// create the widget's necessary sub DOM elements
+			/** create the widget's necessary sub DOM elements */
 			options._tweetFeedElement = options.tweetFeedDecorator ? $(options.tweetFeedDecorator(options)) : null;
 			options._tweetFeedControlsElement = options.tweetFeedControlsDecorator ? $(options.tweetFeedControlsDecorator(options)) : null;
 			options._followButtonElement = options.followButtonDecorator ? $(options.followButtonDecorator(options)) : null;
@@ -699,7 +732,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			options._connectButtonElement = options.connectButtonDecorator ? $(options.connectButtonDecorator(options)): null;
 			options._loginInfoElement = options.loginInfoDecorator ? $(options.loginInfoDecorator(options)) : null;
 
-			// add the widget to the DOM
+			/** add the widget to the DOM */
 			options.mainDecorator(options);
 
 			populateTweetFeed(options);
@@ -712,40 +745,63 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultMainDecorator = function(options)
 	{
-		// defines the default sequence of the widget's elements
-		if (options._tweetFeedElement)
-		{
-			options._baseElement.append(options._tweetFeedElement);
-		}
+		/** if options.parts is not set, use default sequence of the widget's elements */
+		var sequence = options.parts ? options.parts : ['tweets', 'connect-button', 'login-info', 'follow-button', 'tweet-box'];
 
-		if (options._tweetFeedControlsElement)
+		for (var i = 0, len = sequence.length; i < len; i++)
 		{
-			options._baseElement.append(options._tweetFeedControlsElement);
-		}
-
-		if (options._connectButtonElement)
-		{
-			options._baseElement.append(options._connectButtonElement);
-		}
-
-		if (options._loginInfoElement)
-		{
-			options._baseElement.append(options._loginInfoElement);
-		}
-
-		if (options._followButtonElement)
-		{
-			options._baseElement.append(options._followButtonElement);
-		}
-
-		if (options._tweetBoxElement)
-		{
-			options._baseElement.append(options._tweetBoxElement);
+			switch(sequence[i])
+			{
+				case 'tweets':
+				{
+					if (options._tweetFeedElement)
+					{
+						options._baseElement.append(options._tweetFeedElement);
+					}
+					if (options._tweetFeedControlsElement)
+					{
+						options._baseElement.append(options._tweetFeedControlsElement);
+					}
+					break;
+				}
+				case 'connect-button':
+				{
+					if (options._connectButtonElement)
+					{
+						options._baseElement.append(options._connectButtonElement);
+					}
+					break;
+				}
+				case 'login-info':
+				{
+					if (options._loginInfoElement)
+					{
+						options._baseElement.append(options._loginInfoElement);
+					}
+					break;
+				}
+				case 'follow-button':
+				{
+					if (options._followButtonElement)
+					{
+						options._baseElement.append(options._followButtonElement);
+					}
+					break;
+				}
+				case 'tweet-box':
+				{
+					if (options._tweetBoxElement)
+					{
+						options._baseElement.append(options._tweetBoxElement);
+					}
+					break;
+				}
+			}
 		}
 	};
 	defaultTweetFeedControlsDecorator = function(options)
 	{
-		// the default tweet feed's paging controls
+		/** the default tweet feed's paging controls */
 		var html = '';
 
 		if (options._tweetFeedConfig.paging.mode == 'prev-next')
@@ -762,7 +818,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		}
 		else if (options._tweetFeedConfig.paging.mode == 'endless-scroll')
 		{
-			// nothing to do here
+			/** nothing to do here */
 		}
 		else
 		{
@@ -776,15 +832,18 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetFeedControlsMoreBtnDecorator = function(options)
 	{
-		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-more">' + options._resourceBundle._('More') + '</span>';
+		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-more">' +
+			options._resourceBundle._('More') + '</span>';
 	};
 	defaultTweetFeedControlsPrevBtnDecorator = function(options)
 	{
-		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-prev">' + options._resourceBundle._('Prev') + '</span>';
+		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-prev">' +
+			options._resourceBundle._('Prev') + '</span>';
 	};
 	defaultTweetFeedControlsNextBtnDecorator = function(options)
 	{
-		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-next">' + options._resourceBundle._('Next') + '</span>';
+		return '<span class="jta-tweet-list-controls-button jta-tweet-list-controls-button-next">' +
+			options._resourceBundle._('Next') + '</span>';
 	};
 	defaultTweetFeedAutorefreshTriggerDecorator = function(count, options)
 	{
@@ -805,13 +864,15 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetFeedDecorator = function(options)
 	{
-		// the default placeholder for the tweet feed is an unordered list
+		/** the default placeholder for the tweet feed is an unordered list */
 		return '<ul class="jta-tweet-list"></ul>';
 	};
 	defaultTweetDecorator = function(tweet, options)
 	{
-		// the default tweet is made of the optional user's profile image and the
-		// tweet body inside a list item element
+		/**
+		 * the default tweet is made of the optional user's profile image and the
+		 * tweet body inside a list item element
+		 */
 		var html = '';
 
 		if (options._tweetFeedConfig.showProfileImages)
@@ -830,10 +891,10 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetProfileImageDecorator = function(tweet, options)
 	{
-		// if tweet is a native retweet, use the retweet's profile
+		/** if tweet is a native retweet, use the retweet's profile */
 		var t = tweet.retweeted_status || tweet;
 
-		// the default profile image decorator simply adds a link to the user's Twitter profile
+		/** the default profile image decorator simply adds a link to the user's Twitter profile */
 		var screenName = getScreenName(tweet);
 		var imageUrl = t.user ? t.user.profile_image_url : false || t.profile_image_url;
 
@@ -848,7 +909,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetBodyDecorator = function(tweet, options)
 	{
-		// the default tweet body contains the tweet text and the tweet's creation date
+		/** the default tweet body contains the tweet text and the tweet's creation date */
 		var html = '';
 
 		if (options.tweetTextDecorator)
@@ -875,8 +936,10 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	{
 		var tweetText = tweet.text;
 
-		// if usernames should be visible and tweet is a native retweet, use
-		// the original tweet text
+		/**
+		 * if usernames should be visible and tweet is a native retweet, use
+		 * the original tweet text
+		 */
 		if (tweet.retweeted_status &&
 			(
 				options._tweetFeedConfig.showUserScreenNames ||
@@ -889,8 +952,10 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			tweetText = tweet.retweeted_status.text;
 		}
 
-		// the default tweet text decorator optionally marks links, @usernames,
-		// and #hashtags
+		/**
+		 * the default tweet text decorator optionally marks links, @usernames,
+		 * and #hashtags
+		 */
 		if (options.linkDecorator)
 		{
 			tweetText = options.linkDecorator(tweetText, options);
@@ -922,7 +987,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetUsernameDecorator = function(tweet, options)
 	{
-		// if tweet is a native retweet, use the retweet's profile
+		/** if tweet is a native retweet, use the retweet's profile */
 		var screenName = getScreenName(tweet);
 		var fullName = getFullName(tweet);
 
@@ -1028,15 +1093,15 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetTimestampDecorator = function(tweet, options)
 	{
-		// the default tweet timestamp decorator does a little bit of Twitter like formatting.
+		/** the default tweet timestamp decorator does a little bit of Twitter like formatting. */
 
-		// if tweet is a native retweet, use the retweet's timestamp
+		/** if tweet is a native retweet, use the retweet's timestamp */
 		var tw = tweet.retweeted_status || tweet;
 
-		// reformat timestamp from Twitter, so IE is happy
+		/** reformat timestamp from Twitter, so IE is happy */
 		var createdAt = formatDate(tw.created_at);
 
-		// format the timestamp by the tweetTimestampFormatter
+		/** format the timestamp by the tweetTimestampFormatter */
 		var tweetTimestamp = options.tweetTimestampFormatter(createdAt, options);
 		var tweetTimestampTooltip = options.tweetTimestampTooltipFormatter(createdAt);
 
@@ -1113,7 +1178,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetSourceDecorator = function(tweet, options)
 	{
-		// if tweet is a native retweet, use the retweet's source
+		/** if tweet is a native retweet, use the retweet's source */
 		var tw = tweet.retweeted_status || tweet;
 
 		var source = tw.source.replace(/\&lt\;/gi,'<').replace(/\&gt\;/gi,'>').replace(/\&quot\;/gi,'"');
@@ -1131,7 +1196,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	{
 		var html = '';
 
-		// if tweet is a native retweet, use the retweet's source
+		/** if tweet is a native retweet, use the retweet's source */
 		var tw = tweet.retweeted_status || tweet;
 
 		var q = null;
@@ -1167,7 +1232,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultTweetInReplyToDecorator = function(tweet, options)
 	{
-		// if tweet is a native retweet, use the retweet's source
+		/** if tweet is a native retweet, use the retweet's source */
 		var tw = tweet.retweeted_status || tweet;
 
 		var html = '';
@@ -1284,18 +1349,20 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultConnectButtonDecorator = function(options)
 	{
-		// the default placeholder for the @Anywhere ConnectButton
+		/** the default placeholder for the @Anywhere ConnectButton */
 		return '<div class="jta-connect-button"></div>';
 	};
 	defaultLoginInfoDecorator = function(options)
 	{
-		// the default placeholder for the LoginInfo
+		/** the default placeholder for the LoginInfo */
 		return '<div class="jta-login-info"></div>';
 	};
 	defaultLoginInfoContentDecorator = function(options, T)
 	{
-		// the default markup of the LoginInfo content: the user's profile image, the
-		// user's screen_name and a "button" to sign out
+		/**
+		 * the default markup of the LoginInfo content: the user's profile image, the
+		 * user's screen_name and a "button" to sign out
+		 */
 		var html = '';
 
 		if (T.isConnected())
@@ -1325,43 +1392,45 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultFollowButtonDecorator = function(options)
 	{
-		// the default placeholder for the @Anywhere FollowButton
+		/** the default placeholder for the @Anywhere FollowButton */
 		return '<div class="jta-follow-button"></div>';
 	};
 	defaultTweetBoxDecorator = function(options)
 	{
-		// the default placeholder for the @Anywhere TweetBox
+		/** the default placeholder for the @Anywhere TweetBox */
 		return '<div class="jta-tweet-box"></div>';
 	};
 	defaultLinkDecorator = function(text, options)
 	{
-		// the regex to markup links
+		/** the regex to markup links */
 		return text.replace(/((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi,'<a href="$1" class="jta-tweet-a jta-tweet-link" target="_blank" rel="nofollow">$1<\/a>');
 	};
 	defaultUsernameDecorator = function(text, options)
 	{
-		// the regex to markup @usernames. if @Anywhere is present the task is left to
-		// them
+		/**
+		 * the regex to markup @usernames. if @Anywhere is present the task is left to
+		 * them
+		 */
 		return isAnywherePresent() ? text : text.replace(/\B@(\w+)/gi,'@<a href="http://twitter.com/$1" class="jta-tweet-a twitter-anywhere-user" target="_blank" rel="nofollow">$1<\/a>');
 	};
 	defaultHashtagDecorator = function(text, options)
 	{
-		// the regex to markup #hashtags
+		/** the regex to markup #hashtags */
 		return text.replace(/#([a-zA-Z0-9_]+)/gi,'<a href="http://search.twitter.com/search?q=%23$1" class="jta-tweet-a jta-tweet-hashtag" title="#$1" target="_blank" rel="nofollow">#$1<\/a>');
 	};
 	defaultLoadingDecorator = function(options)
 	{
-		// the default loading decorator simply says: loading ...
+		/** the default loading decorator simply says: loading ... */
 		return '<li class="jta-loading">' + options._resourceBundle._('loading') + ' ...</li>';
 	};
 	defaultErrorDecorator = function(errorText, options)
 	{
-		// the default error decorator shows the error message
+		/** the default error decorator shows the error message */
 		return '<li class="jta-error">' + options._resourceBundle._('ERROR') + ': ' + errorText + '</li>';
 	};
 	defaultNoDataDecorator = function(options)
 	{
-		// the default no-data decorator simply says: No more data
+		/** the default no-data decorator simply says: No more data */
 		return '<li class="jta-nodata">' + options._resourceBundle._('No more data') + '</li>';
 	};
 
@@ -1372,7 +1441,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 
 	defaultTweetVisualizer = function(tweetFeedElement, tweetElement, inserter, options)
 	{
-		// insert (append/prepend) the tweetElement to the tweetFeedElement
+		/** insert (append/prepend) the tweetElement to the tweetFeedElement */
 		tweetFeedElement[inserter](tweetElement);
 	};
 	defaultLoadingIndicatorVisualizer = function(tweetFeedElement, loadingIndicatorElement, options, callback)
@@ -1385,11 +1454,13 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	defaultVisualizer = function(container, element, inserter, effectIn, durationIn, effectOut, durationOut, callback)
 	{
-		// if param container is null element has to be removed from
-		// the DOM, else element has to be inserted in container
-
-		// if param callback is not null, the callback function must be called
-		// in any case, if the visualizer is done
+		/**
+		 * if param container is null element has to be removed from
+		 * the DOM, else element has to be inserted in container
+		 *
+		 * if param callback is not null, the callback function must be called
+		 * in any case, if the visualizer is done
+		 */
 
 		var cb = function()
 		{
@@ -1426,7 +1497,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	updateLoginInfoElement = function(options, T)
 	{
-		// update the content of the LoginInfo element
+		/** update the content of the LoginInfo element */
 		if (options._loginInfoElement && options.loginInfoContentDecorator)
 		{
 			options._loginInfoElement.children().remove();
@@ -1439,7 +1510,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	getFeedUrl = function(options, flPaging)
 	{
-		// create the Twitter API URL based on the configuration options
+		/** create the Twitter API URL based on the configuration options */
 		var url = ('https:' == document.location.protocol ? 'https:' : 'http:');
 
 		if (options.searchParams)
@@ -1479,7 +1550,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	isAnywherePresent = function()
 	{
-		// check, if @Anywhere is present
+		/** check, if @Anywhere is present */
 		return (typeof(twttr) != 'undefined' && typeof(twttr.anywhere) != 'undefined');
 	};
 	clearTweetFeed = function(options)
@@ -1495,7 +1566,12 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 
 		options._tweetBoxConfig.label = options._resourceBundle._("What's happening?");
 
-		// if username is an array, create the search query and flatten username
+		if (options.parts && !(options.parts instanceof Array))
+		{
+			options.parts = [options.parts];
+		}
+
+		/** if username is an array, create the search query and flatten username */
 		if (typeof(options.username) != 'string')
 		{
 			if (!options.searchParams)
@@ -1506,44 +1582,52 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			options.username = options.username[0];
 		}
 
-		// if showTweetFeed is not set to a boolean value, we expect the configuration of
-		// the tweet feed
+		/**
+		 * if showTweetFeed is not set to a boolean value, we expect the configuration of
+		 * the tweet feed
+		 */
 		if (typeof(options.showTweetFeed) == 'object')
 		{
 			$.extend(true, options._tweetFeedConfig, options.showTweetFeed);
 		}
 
-		// if showTweetBox is not set to a boolean value, we expect the configuration of
-		// the TweetBox
+		/**
+		 * if showTweetBox is not set to a boolean value, we expect the configuration of
+		 * the TweetBox
+		 */
 		if (typeof(options.showTweetBox) == 'object')
 		{
 			$.extend(true, options._tweetBoxConfig, options.showTweetBox);
 			options.showTweetBox = true;
 		}
 
-		// if showConnectButton is not set to a boolean value, we expect the
-		// configuration of the Connect Button
+		/**
+		 * if showConnectButton is not set to a boolean value, we expect the
+		 * configuration of the Connect Button
+		 */
 		if (typeof(options.showConnectButton) == 'object')
 		{
 			options._connectButtonConfig = options.showConnectButton;
 			options.showConnectButton = true;
 		}
 
-		// to be compatible, check the deprecated option 'tweetProfileImagePresent'
+		/** to be compatible, check the deprecated option 'tweetProfileImagePresent' */
 		if (options._tweetFeedConfig.showProfileImages == null)
 		{
 			options._tweetFeedConfig.showProfileImages = options.tweetProfileImagePresent;
 		}
 
-		// if _tweetFeedConfig.showProfileImages is not set to a boolean value,
-		// we decide to show a profile image if the feed represents a user's
-		// list or the results of a Twitter search
+		/**
+		 * if _tweetFeedConfig.showProfileImages is not set to a boolean value,
+		 * we decide to show a profile image if the feed represents a user's
+		 * list or the results of a Twitter search
+		 */
 		if (options._tweetFeedConfig.showProfileImages == null)
 		{
 			options._tweetFeedConfig.showProfileImages = (options.list || options.searchParams) && options.tweetProfileImageDecorator;
 		}
 
-		// handle the autoConformToTwitterStyleguide
+		/** handle the autoConformToTwitterStyleguide */
 		if (options._tweetFeedConfig.autoConformToTwitterStyleguide)
 		{
 			options._tweetFeedConfig.showUserFullNames = null;
@@ -1553,9 +1637,11 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			options._tweetFeedConfig.showActionFavorite = true;
 		}
 
-		// if _tweetFeedConfig.showUserScreenNames is not set to a boolean value,
-		// we decide to show a username if the feed represents a user's
-		// list or the results of a Twitter search or a tweet is a native retweet
+		/**
+		 * if _tweetFeedConfig.showUserScreenNames is not set to a boolean value,
+		 * we decide to show a username if the feed represents a user's
+		 * list or the results of a Twitter search or a tweet is a native retweet
+		 */
 		if (options._tweetFeedConfig.showUserScreenNames == null)
 		{
 			if (options.list || options.searchParams)
@@ -1569,9 +1655,11 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			}
 		}
 
-		// if _tweetFeedConfig.showUserFullNames is not set to a boolean value,
-		// we decide to show a user's full name if the feed represents a user's
-		// list or the results of a Twitter search or a tweet is a native retweet
+		/**
+		 * if _tweetFeedConfig.showUserFullNames is not set to a boolean value,
+		 * we decide to show a user's full name if the feed represents a user's
+		 * list or the results of a Twitter search or a tweet is a native retweet
+		 */
 		if (options._tweetFeedConfig.showUserFullNames == null)
 		{
 			if (options.list || options.searchParams)
@@ -1596,8 +1684,20 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		options._tweetFeedConfig.paging._offset = 0;
 		options._tweetFeedConfig.paging._limit = options.count;
 
-		// internally, the decision of what parts of a widget are to be
-		// displayed is based on the existence of the decorators
+		/** decide which parts of the widget will be displayed */
+		evaluateWidgetParts(options);
+
+		/** decide which parts of a tweet will be displayed */
+		evaluateTweetParts(options);
+	};
+	evaluateWidgetParts = function(options)
+	{
+		evaluateWidgetPartsOption(options);
+
+		/**
+		 * internally, the decision of what parts of a widget are to be
+		 * displayed is based on the existence of the decorators
+		 */
 		if (options.count == 0 || !options.showTweetFeed)
 		{
 			options.tweetFeedDecorator = null;
@@ -1628,7 +1728,42 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		{
 			options.loginInfoDecorator = null;
 		}
-
+	};
+	evaluateWidgetPartsOption = function(options)
+	{
+		if (options.parts)
+		{
+			/**
+			 * if parts option is set, switch on the corresponding show... option, only
+			 * if not yet set
+			 */
+			for (var i = 0, len = options.parts.length; i < len; i++)
+			{
+				if (options.parts[i] == 'tweets' && !options.showTweetFeed)
+				{
+					options.showTweetFeed = true;
+				}
+				if (options.parts[i] == 'connect-button' && !options.showConnectButton)
+				{
+					options.showConnectButton = true;
+				}
+				if (options.parts[i] == 'login-info' && !options.showLoginInfo)
+				{
+					options.showLoginInfo = true;
+				}
+				if (options.parts[i] == 'follow-button' && !options.showFollowButton)
+				{
+					options.showFollowButton = true;
+				}
+				if (options.parts[i] == 'tweet-box' && !options.showTweetBox)
+				{
+					options.showTweetBox = true;
+				}
+			}
+		}
+	};
+	evaluateTweetParts = function(options)
+	{
 		if (!options._tweetFeedConfig.showTwitterBird)
 		{
 			options.tweetTwitterBirdDecorator = null;
@@ -1678,7 +1813,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	populateTweetFeed = function(options)
 	{
-		// if a tweet feed is to be displayed, get the tweets and show them
+		/** if a tweet feed is to be displayed, get the tweets and show them */
 		if (options.tweetDecorator && options._tweetFeedElement)
 		{
 			getPagedTweets(options, function(tweets, options)
@@ -1690,10 +1825,10 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 
 				hideLoadingIndicator(options, function()
 				{
-					// process the tweets
+					/** process the tweets */
 					$.each(tweets, function(idx, tweet)
 					{
-						// decorate the tweet and give it to the tweet visualizer
+						/** decorate the tweet and give it to the tweet visualizer */
 						options.tweetVisualizer(
 							options._tweetFeedElement,
 							$(options.tweetDecorator(tweet, options)),
@@ -1765,22 +1900,22 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	};
 	insertTriggerTweets = function(options)
 	{
-		// populate the tweet feed with tweets from the autorefresh cache
+		/** populate the tweet feed with tweets from the autorefresh cache */
 		if (options.tweetDecorator && options._autorefreshTweetsCache.length > 0)
 		{
-			// process the autorefresh cache
+			/** process the autorefresh cache */
 			while (options._autorefreshTweetsCache.length > 0)
 			{
-				// get the last tweet and remove it from the autorefresh cache
+				/** get the last tweet and remove it from the autorefresh cache */
 				var tweet = options._autorefreshTweetsCache.pop();
 
-				// put that tweet on top of the tweets cache
+				/** put that tweet on top of the tweets cache */
 				options._tweetsCache.unshift(tweet);
 
-				// adjust paging offset
+				/** adjust paging offset */
 				options._tweetFeedConfig.paging._offset++;
 
-				// decorate the tweet and give it to the tweet visualizer
+				/** decorate the tweet and give it to the tweet visualizer */
 				options.tweetVisualizer(
 					options._tweetFeedElement,
 					$(options.tweetDecorator(tweet, options)),
@@ -1796,8 +1931,10 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	{
 		if (isAnywherePresent())
 		{
-			// if @Anywhere is present, append Hovercards to @username and
-			// profile images
+			/**
+			 * if @Anywhere is present, append Hovercards to @username and
+			 * profile images
+			 */
 			twttr.anywhere(function(T)
 			{
 				T(options._baseSelector + ' .jta-tweet-list').hovercards({expanded: options._tweetFeedConfig.expandHovercards});
@@ -1830,38 +1967,38 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		{
 			twttr.anywhere(function(T)
 			{
-				// optionally add an @Anywhere TweetBox
+				/** optionally add an @Anywhere TweetBox */
 				if (options.tweetBoxDecorator)
 				{
 					T(options._baseSelector + ' .jta-tweet-box').tweetBox(options._tweetBoxConfig);
 				}
 
-				// optionally add an @Anywhere FollowButton
+				/** optionally add an @Anywhere FollowButton */
 				if (options.followButtonDecorator)
 				{
 					T(options._baseSelector + ' .jta-follow-button').followButton(options.username);
 				}
 
-				// optionally add an @Anywhere ConnectButton
+				/** optionally add an @Anywhere ConnectButton */
 				if (options.connectButtonDecorator)
 				{
 					var o = $.extend(
 					{
 						authComplete: function(user)
 						{
-							// display/update login infos on connect/signin event
+							/** display/update login infos on connect/signin event */
 							updateLoginInfoElement(options, T);
 						},
 						signOut: function()
 						{
-							// display/update login infos on signout event
+							/** display/update login infos on signout event */
 							updateLoginInfoElement(options, T);
 						}
 					}, options._connectButtonConfig);
 
 					T(options._baseSelector + ' .jta-connect-button').connectButton(o);
 
-					// display/update login infos
+					/** display/update login infos */
 					updateLoginInfoElement(options, T);
 				}
 			});
@@ -1947,26 +2084,26 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	{
 		if (options._tweetFeedConfig.autorefresh.duration != 0)
 		{
-			// load the data ...
+			/** load the data ... */
 			getRateLimitedData(options, true, getFeedUrl(options, false), function(data, options)
 			{
-				// reverse the sequence of the autorefresh tweets ...
+				/** reverse the sequence of the autorefresh tweets ... */
 				var tweets = (data.results || data).slice(0);
 				tweets.reverse();
 
-				// ...then process them
+				/** ...then process them */
 				$.each(tweets, function(idx, tweet)
 				{
-					// if this tweet is already in one of the tweet caches, ignore it
+					/** if this tweet is already in one of the tweet caches, ignore it */
 					if (!isTweetInAutorefreshCache(tweet, options) && !isTweetInCache(tweet, options))
 					{
-						// optionally filter tweet ...
+						/** optionally filter tweet ... */
 						if (options.tweetFilter(tweet, options))
 						{
-							// ... then put it to the top of the autorefresh cache
+							/** ... then put it to the top of the autorefresh cache */
 							options._autorefreshTweetsCache.unshift(tweet);
 
-							// if a maximum autorefresh cache size is configured, remove elder tweets
+							/** if a maximum autorefresh cache size is configured, remove elder tweets */
 							if (options._tweetFeedConfig.autorefresh.max > 0)
 							{
 								while (options._autorefreshTweetsCache.length > options._tweetFeedConfig.autorefresh.max)
@@ -1981,7 +2118,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 				populateTweetFeed2(options);
 			});
 
-			// restart autorefresh
+			/** restart autorefresh */
 			startAutorefresh(options);
 		}
 	};
@@ -2119,8 +2256,10 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
     		options._tweetFeedConfig._noData
     	)
 		{
-    		// if the requested data is already cached or the max. no. of
-    		// consecutive API calls is reached, use the records
+    		/**
+    		 * if the requested data is already cached or the max. no. of
+    		 * consecutive API calls is reached, use the records
+    		 */
 
     		if (offset + limit > options._tweetsCache.length)
     		{
@@ -2138,7 +2277,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		}
     	else
 		{
-    		// ... if not, load the data, fill the cache and try again
+    		/** ... if not, load the data, fill the cache and try again */
     		++options._tweetFeedConfig._pageParam;
 
     		getRateLimitedData(options, false, getFeedUrl(options, true), function(data, options)
@@ -2153,7 +2292,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 				{
     				$.each(tweets, function(idx, tweet)
     				{
-    					// Snowflake support: just update ids that are currently used
+    					/** Snowflake support: just update ids that are currently used */
     					if (tweet.id_str)
     					{
     						tweet.id = tweet.id_str;
@@ -2164,16 +2303,16 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
     						tweet.in_reply_to_status_id = tweet.in_reply_to_status_id_str;
     					}
 
-    					// save the first tweet id for subsequent paging requests
+    					/** save the first tweet id for subsequent paging requests */
     					if (!options._tweetFeedConfig._maxId)
     					{
     						options._tweetFeedConfig._maxId = tweet.id;
     					}
 
-    					// optionally filter tweet ...
+    					/** optionally filter tweet ... */
     					if (options.tweetFilter(tweet, options))
     					{
-    						// then put it into the cache
+    						/** then put it into the cache */
     						options._tweetsCache.push(tweet);
     					}
     				});
@@ -2216,7 +2355,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		{
 			if (data.error)
 			{
-				// in case of an error, display the error message
+				/** in case of an error, display the error message */
 				showError(options, data.error);
 			}
 			else

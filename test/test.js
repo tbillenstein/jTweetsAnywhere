@@ -187,6 +187,52 @@ jta_test = function(options)
 		strictEqual(testOptions.count, 5, 'count hasn`t changed');
 	});
 
+	test("evaluateWidgetPartsOption()", function()
+	{
+		var testOptions =
+		{
+			showTweetFeed: false, showFollowButton: false, showConnectButton: false, showLoginInfo: false, showTweetBox: false
+		};
+
+		evaluateWidgetPartsOption(testOptions);
+
+		strictEqual(testOptions.showTweetFeed, false, 'no side effects, if parts not set - 1');
+		strictEqual(testOptions.showFollowButton, false, 'no side effects, if parts not set - 2');
+		strictEqual(testOptions.showConnectButton, false, 'no side effects, if parts not set - 3');
+		strictEqual(testOptions.showLoginInfo, false, 'no side effects, if parts not set - 4');
+		strictEqual(testOptions.showTweetBox, false, 'no side effects, if parts not set - 5');
+
+
+		testOptions =
+		{
+			showTweetFeed: false, showFollowButton: false, showConnectButton: false, showLoginInfo: false, showTweetBox: false,
+			parts: ['tweets', 'follow-button', 'connect-button', 'login-info', 'tweet-box']
+		};
+
+		evaluateWidgetPartsOption(testOptions);
+
+		strictEqual(testOptions.showTweetFeed, true, 'switch on parts - 1');
+		strictEqual(testOptions.showFollowButton, true, 'switch on parts - 2');
+		strictEqual(testOptions.showConnectButton, true, 'switch on parts - 3');
+		strictEqual(testOptions.showLoginInfo, true, 'switch on parts - 4');
+		strictEqual(testOptions.showTweetBox, true, 'switch on parts - 5');
+
+
+		testOptions =
+		{
+			showTweetFeed: { foo: 'bar' }, showFollowButton: false, showConnectButton: false, showLoginInfo: false, showTweetBox: { x: 'y' },
+			parts: ['tweets', 'connect-button', 'tweet-box']
+		};
+
+		evaluateWidgetPartsOption(testOptions);
+
+		strictEqual(testOptions.showTweetFeed.foo, 'bar', 'dont override');
+		strictEqual(testOptions.showFollowButton, false, 'dont override');
+		strictEqual(testOptions.showConnectButton, true, 'override');
+		strictEqual(testOptions.showLoginInfo, false, 'dont override');
+		strictEqual(testOptions.showTweetBox.x, 'y', 'dont override');
+	});
+
 	/*************************************************************************/
 	/* Formatter tests                                                       */
 	/*************************************************************************/
