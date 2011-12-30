@@ -1,3 +1,6 @@
+V1.3.1
+* Bugfix: Fixed an issue with tweets loaded in auto-refreshing mode might have wrong tweet-id. Thanks to Aaron Markie!
+
 V1.3.0
 * Feature: Added support for I18N ('en' and 'de' resources supplied).
 * Feature: Added support for Twitter's Web Intents (Reply, Retweet, Favorite tweets).
