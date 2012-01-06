@@ -153,6 +153,14 @@ jta_test = function(options)
 			'multiple search params');
 	});
 
+	test("getRateLimitUrl()", function()
+	{
+		strictEqual(
+			getRateLimitUrl({}),
+			'http://api.twitter.com/1/account/rate_limit_status.json?callback=?',
+			'getRateLimitUrl');
+	});
+
 	/*************************************************************************/
 	/* Setup / Options tests                                                 */
 	/*************************************************************************/
