@@ -1,5 +1,5 @@
 	var rateLimit = 150;
-	mockedRateLimitDataProvider = function(callback)
+	mockedRateLimitDataProvider = function(url, callback)
 	{
 		var getRateLimit = function(fct)
 		{

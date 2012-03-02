@@ -153,6 +153,29 @@ jta_test = function(options)
 			'multiple search params');
 	});
 
+	test("getRateLimitUrl()", function()
+	{
+		strictEqual(
+			getRateLimitUrl({}),
+			'http://api.twitter.com/1/account/rate_limit_status.json?callback=?',
+			'getRateLimitUrl');
+	});
+
+	test("getProfileImageUrl()", function()
+	{
+		strictEqual(
+			getProfileImageUrl({},
+			{
+				user:
+				{
+					profile_image_url_https: "https:\/\/si0.twimg.com\/profile_images\/1174864395\/protrait-twitter_normal.jpg",
+					profile_image_url : "http:\/\/a0.twimg.com\/profile_images\/1174864395\/protrait-twitter_normal.jpg"
+				}
+			}),
+			'http:\/\/a0.twimg.com\/profile_images\/1174864395\/protrait-twitter_normal.jpg',
+			'getProfileImageUrl');
+	});
+
 	/*************************************************************************/
 	/* Setup / Options tests                                                 */
 	/*************************************************************************/
