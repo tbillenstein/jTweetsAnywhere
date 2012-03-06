@@ -82,7 +82,7 @@ Features
 
 &nbsp;
 
-* I18N: Currently supports english and german languages
+* I18N: Currently supports english, german, dutch and spanish languages
 
 External references
 -------------------
