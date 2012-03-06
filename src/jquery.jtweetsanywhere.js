@@ -622,10 +622,29 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			onRateLimitDataHandler: defaultOnRateLimitDataHandler,
 
 			/**
-			 * The OnOptionsInitializingHandler event handler is called before initializing
-			 * the user options
+			 * The onOptionsInitializingHandler event handler is called before initializing
+			 * the user options.
 			 */
 			onOptionsInitializingHandler: defaultOnOptionsInitializingHandler,
+
+			/**
+			 * The onReadyHandler event handler is called once after the tweets are
+			 * initially loaded and added to the DOM. Immediately after calling this
+			 * event handler the onFeedPopulationHandler is called with the invocations
+			 * parameter set to 0.
+			 */
+			onReadyHandler: defaultOnReadyHandler,
+
+			/**
+			 * The onFeedPopulationHandler event handler is called each time new tweets were added to
+			 * the tweet feed - and thereby to the DOM. The supplied event handler should have the
+			 * following interface: function(invocations, options) {}
+			 * The invocations parameter contains the present # of calls to the handler, starting
+			 * at 0 for the first call
+			 * This event handler is called either for populating the feed by paging or by
+			 * autorefreshing.
+			 */
+			onFeedPopulationHandler: defaultOnFeedPopulationHandler,
 
 			_tweetFeedConfig:
 			{
@@ -701,7 +720,8 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 					hourly_limit: 150
 				}
 			},
-			_resourceBundle: null
+			_resourceBundle: null,
+			_populationCount: 0
 		}, config);
 
 		/** save the plugin's base selector */
@@ -1494,6 +1514,12 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	defaultOnOptionsInitializingHandler = function(options)
 	{
 	};
+	defaultOnReadyHandler = function(options)
+	{
+	};
+	defaultOnFeedPopulationHandler = function(invocations, options)
+	{
+	};
 	updateLoginInfoElement = function(options, T)
 	{
 		/** update the content of the LoginInfo element */
@@ -1804,6 +1830,20 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 					}
 
 					addHovercards(options);
+
+					/**
+					 * Here - if a tweet feed is configured - all initially loaded
+					 * tweets were given to the configured tweet visualizer and should
+					 * be inserted in the DOM now. Exception: A user supplied tweet
+					 * visualizer that caches the tweets for later display, without
+					 * inserting them immediatly in the DOM.
+					 */
+					if (options._populationCount < 1)
+					{
+						options.onReadyHandler(options);
+					}
+
+					options.onFeedPopulationHandler(options._populationCount++, options);
 				});
 			});
 		}
@@ -1880,6 +1920,8 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 			}
 
 			addHovercards(options);
+
+			options.onFeedPopulationHandler(options._populationCount++, options);
 		}
 	};
 	addHovercards = function(options)
