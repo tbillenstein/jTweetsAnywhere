@@ -1,5 +1,5 @@
 
-JTA_I18N.addResourceBundle('jTweetsAnywhere', 'de',
+JTA_I18N.addResourceBundle('jTweetsAnywhere', 'es',
 {
 	'More': 'más',
 	'Prev': 'previo',
