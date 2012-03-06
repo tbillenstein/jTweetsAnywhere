@@ -657,7 +657,6 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 					mode: "none",
 					interval: 60,
 					duration: 3600,
-					max: -1,
 					_startTime: null,
 					_triggerElement: null
 				},
@@ -1636,10 +1635,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		options.count = validateRange(options.count, 0, options.searchParams ? 100 : 20);
 
 		options._tweetFeedConfig.autorefresh.interval = Math.max(30, options._tweetFeedConfig.autorefresh.interval);
-		if (options._tweetFeedConfig.autorefresh.max <= 0)
-		{
-			options._tweetFeedConfig.autorefresh.max = -1;
-		}
+
 		options._tweetFeedConfig.paging._offset = 0;
 		options._tweetFeedConfig.paging._limit = options.count;
 
@@ -2053,7 +2049,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 				/** ...then process them */
 				$.each(tweets, function(idx, tweet)
 				{
-					// Snowflake support: just update ids that are currently used
+					/** Snowflake support: just update ids that are currently used */
 					if (tweet.id_str)
 					{
 						tweet.id = tweet.id_str;
@@ -2064,6 +2060,19 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 						tweet.in_reply_to_status_id = tweet.in_reply_to_status_id_str;
 					}
 
+					if (tweet.retweeted_status)
+					{
+    					if (tweet.retweeted_status.id_str)
+    					{
+    						tweet.retweeted_status.id = tweet.retweeted_status.id_str;
+    					}
+
+    					if (tweet.retweeted_status.in_reply_to_status_id_str)
+    					{
+    						tweet.retweeted_status.in_reply_to_status_id = tweet.retweeted_status.in_reply_to_status_id_str;
+    					}
+					}
+
 					/** if this tweet is already in one of the tweet caches, ignore it */
 					if (!isTweetInAutorefreshCache(tweet, options) && !isTweetInCache(tweet, options))
 					{
@@ -2072,15 +2081,6 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 						{
 							/** ... then put it to the top of the autorefresh cache */
 							options._autorefreshTweetsCache.unshift(tweet);
-
-							/** if a maximum autorefresh cache size is configured, remove elder tweets */
-							if (options._tweetFeedConfig.autorefresh.max > 0)
-							{
-								while (options._autorefreshTweetsCache.length > options._tweetFeedConfig.autorefresh.max)
-								{
-									options._autorefreshTweetsCache.pop();
-								}
-							}
 						}
 					}
 				});
@@ -2272,6 +2272,19 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
     					{
     						tweet.in_reply_to_status_id = tweet.in_reply_to_status_id_str;
     					}
+
+    					if (tweet.retweeted_status)
+						{
+        					if (tweet.retweeted_status.id_str)
+        					{
+        						tweet.retweeted_status.id = tweet.retweeted_status.id_str;
+        					}
+
+        					if (tweet.retweeted_status.in_reply_to_status_id_str)
+        					{
+        						tweet.retweeted_status.in_reply_to_status_id = tweet.retweeted_status.in_reply_to_status_id_str;
+        					}
+						}
 
     					/** save the first tweet id for subsequent paging requests */
     					if (!options._tweetFeedConfig._maxId)
