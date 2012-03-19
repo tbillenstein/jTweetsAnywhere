@@ -430,6 +430,37 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		     *									// the number of new tweets. These new tweets are inserted on top of the tweet
 		     *									// feed, if the user clicks on the button.
 		     *
+		     *	       behavior: '?',           // This options controls the behavior of the plugin when new tweets are to be
+		     *									// inserted. Different approaches are eligible, depending on the paging.mode
+		     *									// and on the autorefresh.mode.
+		     *
+		     *                                  // Accepted values for behavior are: "expand-list" | "keep-list-size" |
+		     *                                  // "move-to-inserted" | "keep-position"
+		     *
+		     *                                  // The values "expand-list" and "keep-list-size" work in conjunction with
+		     *                                  // paging.mode "none" and "more".
+		     *
+		     *                                  // If behavior equals "expand-list" (the default behavior for paging.mode "none"
+		     *                                  // and "more") new tweets will be inserted before existing ones, resulting in a
+		     *                                  // growing tweet feed.
+		     *
+		     *                                  // If behavior equals "keep-list-size" then for each inserted tweet the last
+		     *                                  // displayed tweet will be removed, resulting in a constant size tweet feed.
+		     *
+		     *                                  // The values "move-to-inserted" and "keep-position" work in conjunction with
+		     *                                  // paging.mode "prev-next" and "endless-scroll".
+		     *
+		     *                                  // If behavior equals "move-to-inserted" (the default behavior for paging.mode
+		     *                                  // "prev-next" and "endless-scroll", if autorefresh.mode equals "trigger-insert")
+		     *                                  // then after inserting new tweets to the tweet feed these tweets will be brought
+		     *                                  // into view. Keep in mind that if you use this option if autorefresh.mode equals
+		     *                                  // "auto-insert" your users might be harshly interrupted while reading tweets.
+		     *
+		     *                                  // If behavior equals "keep-position" (the default behavior for paging.mode
+		     *                                  // "prev-next" and "endless-scroll", if autorefresh.mode equals "auto-insert")
+		     *                                  // then new tweets will silently be inserted in the tweet feed without changing
+		     *                                  // the user's viewport.
+		     *
 		     *	       interval: 60,			// Time in seconds to be waited until the next request for new tweets. Minimum
 		     *									// value is 30.
 		     *
@@ -676,6 +707,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 					mode: "none",
 					interval: 60,
 					duration: 3600,
+					behavior: null,
 					_startTime: null,
 					_triggerElement: null
 				},
@@ -1458,10 +1490,18 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		return true;
 	};
 
-	defaultTweetVisualizer = function(tweetFeedElement, tweetElement, inserter, options)
+	defaultTweetVisualizer = function(tweetFeedElement, tweetElement, manipulator, options)
 	{
-		/** insert (append/prepend) the tweetElement to the tweetFeedElement */
-		tweetFeedElement[inserter](tweetElement);
+		if (manipulator === 'remove')
+		{
+			/** remove the tweetElement from the tweetFeedElement */
+			tweetElement.remove();
+		}
+		else
+		{
+			/** insert (append/prepend) the tweetElement to the tweetFeedElement */
+			tweetFeedElement[manipulator](tweetElement);
+		}
 	};
 	defaultLoadingIndicatorVisualizer = function(tweetFeedElement, loadingIndicatorElement, options, callback)
 	{
@@ -1542,7 +1582,18 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	{
 		if (options._tweetFeedElement)
 		{
-			options._tweetFeedElement.empty();
+			$.each(options._tweetFeedElement.children(), function(idx, element)
+			{
+				if (!(options._tweetFeedConfig.autorefresh._triggerElement && idx === 0))
+				{
+					options.tweetVisualizer(
+						options._tweetFeedElement,
+						$(element),
+						'remove',
+						options
+					);
+				}
+			});
 		}
 	};
 	setupOptions = function(options)
@@ -1664,6 +1715,31 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 
 		options._tweetFeedConfig.paging._offset = 0;
 		options._tweetFeedConfig.paging._limit = options.count;
+
+		/** if autorefresh.behavior is not set by user, set default value */
+		if (!options._tweetFeedConfig.autorefresh.behavior)
+		{
+			if (options._tweetFeedConfig.paging.mode === 'none' ||
+				options._tweetFeedConfig.paging.mode === 'more'
+			)
+			{
+				options._tweetFeedConfig.autorefresh.behavior = 'expand-list';
+			}
+			else if (options._tweetFeedConfig.paging.mode === 'prev-next' ||
+				options._tweetFeedConfig.paging.mode === 'endless-scroll'
+			)
+			{
+				if (options._tweetFeedConfig.autorefresh.mode === 'auto-insert')
+				{
+					options._tweetFeedConfig.autorefresh.behavior = 'keep-position';
+				}
+				else
+				{
+					/** autorefresh.mode === 'trigger-insert' */
+					options._tweetFeedConfig.autorefresh.behavior = 'move-to-inserted';
+				}
+			}
+		}
 
 		/** decide which parts of the widget will be displayed */
 		evaluateWidgetParts(options);
@@ -1833,9 +1909,9 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 
 					/**
 					 * Here - if a tweet feed is configured - all initially loaded
-					 * tweets were given to the configured tweet visualizer and should
-					 * be inserted in the DOM now. Exception: A user supplied tweet
-					 * visualizer that caches the tweets for later display, without
+					 * tweets were already given to the configured tweet visualizer
+					 * and should be inserted in the DOM now. Exception: A user supplied
+					 * tweet visualizer that caches the tweets for later display, without
 					 * inserting them immediatly in the DOM.
 					 */
 					if (options._populationCount < 1)
@@ -1898,30 +1974,98 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		/** populate the tweet feed with tweets from the autorefresh cache */
 		if (options.tweetDecorator && options._autorefreshTweetsCache.length > 0)
 		{
+			var noneOrMorePagingMode = options._tweetFeedConfig.paging.mode === 'none' ||
+				options._tweetFeedConfig.paging.mode === 'more';
+
+			var endlessScrollPagingMode = options._tweetFeedConfig.paging.mode === 'endless-scroll';
+
+			var tweetsToBeInsertedCount = options._autorefreshTweetsCache.length;
+
+			var elementsAdded = [];
+
 			/** process the autorefresh cache */
 			while (options._autorefreshTweetsCache.length > 0)
 			{
-				/** get the last tweet and remove it from the autorefresh cache */
+				/** remove the last tweet from the autorefresh cache */
 				var tweet = options._autorefreshTweetsCache.pop();
 
-				/** put that tweet on top of the tweets cache */
+				/** and put it on top of the tweets cache */
 				options._tweetsCache.unshift(tweet);
+
+				/**
+				 * if paging mode is 'none' or 'more' and behavior is 'keep-list-size'
+				 * for each tweet to be inserted, remove the last one to keep the list
+				 * size constant
+				 */
+				if (noneOrMorePagingMode && options._tweetFeedConfig.autorefresh.behavior === 'keep-list-size')
+				{
+					/** adjust paging offset */
+					options._tweetFeedConfig.paging._offset--;
+
+					options.tweetVisualizer(
+						options._tweetFeedElement,
+						options._tweetFeedElement.children().last(),
+						'remove',
+						options
+					);
+				}
 
 				/** adjust paging offset */
 				options._tweetFeedConfig.paging._offset++;
 
-				/** decorate the tweet and give it to the tweet visualizer */
-				options.tweetVisualizer(
-					options._tweetFeedElement,
-					$(options.tweetDecorator(tweet, options)),
-					'prepend',
-					options
-				);
+				if (noneOrMorePagingMode || endlessScrollPagingMode)
+				{
+					/** decorate the tweet and give it to the tweet visualizer */
+					var $tweet = $(options.tweetDecorator(tweet, options));
+
+					options.tweetVisualizer(
+						options._tweetFeedElement,
+						$tweet,
+						'prepend',
+						options
+					);
+
+					if (endlessScrollPagingMode)
+					{
+						elementsAdded.push($tweet);
+					}
+				}
 			}
 
-			addHovercards(options);
+			if (noneOrMorePagingMode || endlessScrollPagingMode)
+			{
+				if (endlessScrollPagingMode)
+				{
+					if (options._tweetFeedConfig.autorefresh.behavior === 'keep-position')
+					{
+						var pixelsAdded = 0;
 
-			options.onFeedPopulationHandler(options._populationCount++, options);
+						$.each(elementsAdded, function(idx, $tweet)
+						{
+							pixelsAdded += $tweet.outerHeight();
+						});
+
+						options._tweetFeedElement.scrollTop(options._tweetFeedElement.scrollTop() + pixelsAdded);
+					}
+					else if (options._tweetFeedConfig.autorefresh.behavior === 'move-to-inserted')
+					{
+						options._tweetFeedElement.scrollTop(0);
+					}
+				}
+
+				addHovercards(options);
+				options.onFeedPopulationHandler(options._populationCount++, options);
+			}
+			else if (options._tweetFeedConfig.paging.mode == 'prev-next')
+			{
+				if ((options._tweetFeedConfig.autorefresh.behavior === 'keep-position' &&
+					options._tweetFeedConfig.paging._offset - tweetsToBeInsertedCount <= 0) ||
+					options._tweetFeedConfig.autorefresh.behavior === 'move-to-inserted'
+				)
+				{
+					doPage(options, true, 0);
+				}
+			}
 		}
 	};
 	addHovercards = function(options)
@@ -2062,7 +2206,6 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 	startAutorefresh = function(options)
 	{
 		if (options._tweetFeedConfig.autorefresh.mode != 'none' &&
-			options._tweetFeedConfig.paging.mode != 'prev-next' &&
 			options._tweetFeedConfig.autorefresh.duration != 0 &&
 			(
 				options._tweetFeedConfig.autorefresh.duration < 0 ||

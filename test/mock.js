@@ -18,7 +18,7 @@
 	};
 
 	var tweetCounter = 0;
-	var autorefreshCounter = 0;
+	var autorefreshCounter = 1;
 	mockedTweetDataProvider = function(url, callback)
 	{
 		var getData = function(url, fct)
@@ -431,6 +431,8 @@
 
 		var getAutorefreshData = function()
 		{
+			autorefreshCounter += 3;
+
 			return [
 			{
 				"location" : "\u30d5\u30e9\u30f3\u30b9\u3000\u30d1\u30ea",
@@ -442,8 +444,8 @@
 					"result_type" : "recent"
 				},
 				"to_user_id" : null,
-				"text" : "TICKER TICKER TICKER \u4e45\u3057\u3076\u308a\u306e\u30e1\u30c8\u30ed4\u53f7\u7dda\u3002\u6709\u8272\u4eba\u7a2e\u5144\u3061\u3083\u3093\u306e\u3001\u30af\u30df\u30f3\u98a8\u5473\u306e\u814b\u81ed\u306b\u9f3b\u3092\u6253\u305f\u308c\u305f\u3002",
-				"id" : autorefreshCounter++,
+				"text" : "#" + (autorefreshCounter - 1) + "   -   " + "TICKER TICKER TICKER \u4e45\u3057\u3076\u308a\u306e\u30e1\u30c8\u30ed4\u53f7\u7dda\u3002\u6709\u8272\u4eba\u7a2e\u5144\u3061\u3083\u3093\u306e\u3001\u30af\u30df\u30f3\u98a8\u5473\u306e\u814b\u81ed\u306b\u9f3b\u3092\u6253\u305f\u308c\u305f\u3002",
+				"id" : "" + (autorefreshCounter - 1),
 				"from_user_id" : 102766073,
 				"geo" : null,
 				"iso_language_code" : "ja",
@@ -459,8 +461,8 @@
 					"result_type" : "recent"
 				},
 				"to_user_id" : 3861869,
-				"text" : "TICKER TICKER TICKER @bulleblue ARF. NICE. -__-",
-				"id" : autorefreshCounter++,
+				"text" : "#" + (autorefreshCounter - 2) + "   -   " + "TICKER TICKER TICKER @bulleblue ARF. NICE. -__-",
+				"id" : "" + (autorefreshCounter - 2),
 				"from_user_id" : 1496019,
 				"to_user" : "bulleblue",
 				"geo" : null,
@@ -477,8 +479,8 @@
 					"result_type" : "recent"
 				},
 				"to_user_id" : null,
-				"text" : "RT @PaoloBrini: #Microsoft reaction against anti #piracy enforcement used to silence and intimidate NGOs in Russia. http://bit.ly/9xQ3Gp",
-				"id" : 24461117630,
+				"text" : "#" + (autorefreshCounter - 3) + "   -   " + "RT @PaoloBrini: #Microsoft reaction against anti #piracy enforcement used to silence and intimidate NGOs in Russia. http://bit.ly/9xQ3Gp",
+				"id" : "" + (autorefreshCounter - 3),
 				"from_user_id" : 569078,
 				"geo" : null,
 				"iso_language_code" : "en",

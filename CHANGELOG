@@ -1,3 +1,14 @@
+Current development version
+* Feature: Added configuration option autorefresh.behavior to control how new tweets will be inserted in autorefresh mode.
+* Feature: Added configuration option onReadyHandler and onFeedPopulationHandler.
+* Feature: Added configuration option parts to define the presence and sequence of the widget elements.
+* Feature: Added 'es' locale script. Thanks to Francisco!
+* Feature: Added 'nl' locale script. Thanks to Mathijs!
+* Bugfix: When removing a tweet from the tweet feed the tweetVisualizer will used instead of just removing the element from the DOM.
+* Bugfix: Fixed issue with invalid link to a retweet's status page when clicking on the retweet's timestamp.
+* Bugfix: Fixed minor CSS flaw.
+* Bugfix: Fixed issues with ssl enabled page.
+
 V1.3.1
 * Bugfix: Fixed an issue with tweets loaded in auto-refreshing mode might have wrong tweet-id. Thanks to Aaron Markie!
 
@@ -5,21 +16,21 @@ V1.3.0
 * Feature: Added support for I18N ('en' and 'de' resources supplied).
 * Feature: Added support for Twitter's Web Intents (Reply, Retweet, Favorite tweets).
 * Feature: Added support for users' favorite tweets.
-* Feature: Added configuration option <code>locale</code>.
-* Feature: Added configuration option <code>showTweetFeed.autoConformToTwitterStyleguide</code> (Sets options to confirm to Twitter's styleguide regulations).
-* Feature: Added configuration option <code>showTweetFeed.showTwitterBird</code> (Show/hide Twitter bird icon beneath the timestamp of a tweet, linking to the tweeter's MiniProfile Web Intent).
-* Feature: Added configuration option <code>showTweetFeed.showActionReply</code> (Show tweet's 'Reply' action: supplies a link to popup the tweet's Reply Web Intent).
-* Feature: Added configuration option <code>showTweetFeed.showActionRetweet</code> (Show tweet's 'Retweet' action: supplies a link to popup the tweet's Retweet Web Intent).
-* Feature: Added configuration option <code>showTweetFeed.showActionFavorite</code> (Show tweet's 'Favorite' action (supplies a link to popup the tweet's Favorite Web Intent).
-* Feature: Added configuration option <code>tweetDataProvider</code>.
-* Feature: Added configuration option <code>rateLimitDataProvider</code>.
-* Feature: Added configuration option <code>tweetTwitterBirdDecorator</code>.
-* Feature: Added configuration option <code>tweetActionsDecorator</code>.
-* Feature: Added configuration option <code>tweetActionReplyDecorator</code>.
-* Feature: Added configuration option <code>tweetActionRetweetDecorator</code>.
-* Feature: Added configuration option <code>tweetActionFavoriteDecorator</code>.
-* Bugfix: Fixed an issue with showing duplicate tweets in the feed while using the <code>{literal}autorefresh: { mode: 'trigger-insert' }{/literal}</code> feature. Thanks to Adam Southorn!
-* Bugfix: Fixed an issue to prevent interference with the standard <code>widgets.js</code> file for the Tweet button. Thanks to Brad Beebe!
+* Feature: Added configuration option locale.
+* Feature: Added configuration option showTweetFeed.autoConformToTwitterStyleguide (Sets options to confirm to Twitter's styleguide regulations).
+* Feature: Added configuration option showTweetFeed.showTwitterBird (Show/hide Twitter bird icon beneath the timestamp of a tweet, linking to the tweeter's MiniProfile Web Intent).
+* Feature: Added configuration option showTweetFeed.showActionReply (Show tweet's 'Reply' action: supplies a link to popup the tweet's Reply Web Intent).
+* Feature: Added configuration option showTweetFeed.showActionRetweet (Show tweet's 'Retweet' action: supplies a link to popup the tweet's Retweet Web Intent).
+* Feature: Added configuration option showTweetFeed.showActionFavorite (Show tweet's 'Favorite' action (supplies a link to popup the tweet's Favorite Web Intent).
+* Feature: Added configuration option tweetDataProvider.
+* Feature: Added configuration option rateLimitDataProvider.
+* Feature: Added configuration option tweetTwitterBirdDecorator.
+* Feature: Added configuration option tweetActionsDecorator.
+* Feature: Added configuration option tweetActionReplyDecorator.
+* Feature: Added configuration option tweetActionRetweetDecorator.
+* Feature: Added configuration option tweetActionFavoriteDecorator.
+* Bugfix: Fixed an issue with showing duplicate tweets in the feed while using the {literal}autorefresh: { mode: 'trigger-insert' }{/literal} feature. Thanks to Adam Southorn!
+* Bugfix: Fixed an issue to prevent interference with the standard widgets.js file for the Tweet button. Thanks to Brad Beebe!
 * Bugfix: Fixed an issue with handling auto linking of @username and email addresses. Thanks to Brad Beebe!
 * Bugfix: The retweeter's screen name was not displayed correctly.
 * Test: 100+ Unit tests added, based on QUnit (Javascript Unit Testing Framework).
