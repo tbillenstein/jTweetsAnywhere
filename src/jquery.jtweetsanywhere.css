@@ -140,12 +140,12 @@
 	background-color: transparent;
 	background-repeat: no-repeat;
 	background-position: 0px 0px;
-	background-image: url(http://si0.twimg.com/images/dev/cms/intents/bird/bird_gray/bird_16_gray.png);
+	background-image: url(//si0.twimg.com/images/dev/cms/intents/bird/bird_gray/bird_16_gray.png);
 }
 
 .jta-tweet-twitter-bird-icon:hover
 {
-	background-image: url(http://si0.twimg.com/images/dev/cms/intents/bird/bird_black/bird_16_black.png);
+	background-image: url(//si0.twimg.com/images/dev/cms/intents/bird/bird_black/bird_16_black.png);
 }
 
 .jta-tweet-timestamp
