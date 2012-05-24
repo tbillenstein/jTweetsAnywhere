@@ -1419,7 +1419,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		if (T.isConnected())
 		{
 			var screenName = T.currentUser.data('screen_name');
-			var imageUrl = T.currentUser.data('profile_image_url');
+            var imageUrl = ('https:' == document.location.protocol ? T.currentUser.data('profile_image_url_https') : T.currentUser.data('profile_image_url'));
 
 			html =
 				'<div class="jta-login-info-profile-image">' +
@@ -2601,7 +2601,7 @@ JTA_I18N.addResourceBundle('jTweetsAnywhere', 'en',
 		}
 		else
 		{
-			imageUrl = tweet.profile_image_url;
+			imageUrl = ('https:' == document.location.protocol ? tweet.profile_image_url_https : tweet.profile_image_url);
 		}
 
 		return imageUrl;
