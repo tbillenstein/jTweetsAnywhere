@@ -1160,7 +1160,7 @@
 	defaultHashtagDecorator = function(text, options)
 	{
 		// the regex to markup #hashtags
-		return text.replace(/#([a-zA-Z0-9_]+)/gi,'<a href="http://search.twitter.com/search?q=%23$1" class="jta-tweet-a jta-tweet-hashtag" title="#$1" target="_blank" rel="nofollow">#$1<\/a>');
+		return text.replace(/#([a-zA-Z0-9_]+)/gi,'<a href="https://twitter.com/search?q=%23$1" class="jta-tweet-a jta-tweet-hashtag" title="#$1" target="_blank" rel="nofollow">#$1<\/a>');
 	};
 	defaultLoadingDecorator = function(options)
 	{
