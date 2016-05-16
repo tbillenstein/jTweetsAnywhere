@@ -84,15 +84,6 @@ Features
 
 * I18N: Currently supports english, german, dutch and spanish languages
 
-External references
--------------------
-
-* [Demo](http://thomasbillenstein.com/jTweetsAnywhere/demo/) - The demo pages
-* [Usage](http://thomasbillenstein.com/jTweetsAnywhere/#jta_usage) - Quickstart guide
-* [Documentation](http://thomasbillenstein.com/jTweetsAnywhere/#jta_documentation) - Describes all configurable plugin options
-* [Additional notes](http://thomasbillenstein.com/jTweetsAnywhere/registration-details-and-local-server-setup/) - Details on Twitter's @Anywhere registration and how to set up a local web server for testing purposes
-* [Blog](http://thomasbillenstein.com/blog/) - Find blog posts related to jTweetsAnywhere
-
 Support
 -------
 
